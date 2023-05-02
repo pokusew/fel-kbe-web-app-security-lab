@@ -83,3 +83,14 @@ But the following does NOT work:
 ')) AND 1 = 0 UNION SELECT 'something' as username -- 
 ```
 
+
+## Task 4
+
+Once I successfully logged in, I started exploring the UI and all its features.
+I noticed the link “Warning!” which led to the URL `https://kbe.felk.cvut.cz/index.php?open=warning.txt`.
+Almost immediately I tried replacing `warning.txt` with `index.php`.
+And to my pleasant surprise, the server responded with a highlighted source code of the index.php.
+After a quick look, I figured it must be the same index.php that is actually running on the server.
+
+**Note 3:** In fact, no login is needed to access https://kbe.felk.cvut.cz/index.php?open=index.php.
+**Note 4:** The code confirms my suspicions from [Task 3's Side note](#side-note).
