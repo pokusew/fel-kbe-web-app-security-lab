@@ -55,8 +55,10 @@ Using the following query (password), I found out my secret is `E5XVZ2XDHS4SNGE2
 ')) AND 1 = 0 UNION SELECT secret FROM users WHERE username = 'endlemar' -- 
 ```
 
-Once I had the secret, I created a new account using the secret as “a setup key” within the mobile Google Authenticator
-app so that I could generate the corresponding OTPs. The generated OTPs worked I got in.
+Once I had the secret, I used the Google Authenticator mobile app to generate the corresponding OTPs
+(by manually creating a new account using the secret as “a setup key”).
+
+The generated OTPs worked and I got in.
 
 ### Side note
 
