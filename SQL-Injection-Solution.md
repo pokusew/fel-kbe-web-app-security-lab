@@ -3,7 +3,7 @@
 See [the assignment here](./SQL-Injection-Assignment.md).
 
 
-# Task 1
+## Task 1
 
 First, I entered Username `endlemar` and password `'XXX`.
 
