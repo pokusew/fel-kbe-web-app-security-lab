@@ -21,7 +21,8 @@ will result one row where username is `endlemar`:
 ```
 
 **Note 1:** There is a trailing space in `-- `.
-**Note 2:** It seems that the entered Username in the form does not affect what the app does when using this SQL injection.
+
+**Note 2:** The entered Username in the form does not affect the result of the SQL query when using this SQL injection.
 
 
 ## Task 2
