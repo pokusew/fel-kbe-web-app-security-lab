@@ -249,3 +249,42 @@ part of a leaked Microsoft Windows XP serial number `FM9FY - TMF7Q - ...`.
 ## Task 8
 
 See my solution of [Task 4](#task-4).
+
+
+## Task 9
+
+By having my messages (username `endlemar`) in both forms – decrypted (read from the web app after successful login) and
+base64-encoded XOR-encrypted (`base64_message_xor_key` extracted from the database in [Task 4](#task-4)), I just simply
+XORed both representations (and appropriately base64-decoded) to get the XOR key.
+
+The following table provides the detailed data:
+
+|                                message                                 |                                  base64_message_xor_key                                  |        base64_decode(base64_message_xor_key) XOR message         |
+|------------------------------------------------------------------------|------------------------------------------------------------------------------------------|------------------------------------------------------------------|
+| Welcome &lt;b>endlemar&lt;/b>, this is your first secret message.      | PAcJPA5ZA0JjGlEXMQ8JHDJTQg4dCVxJfxVcDxF/ERxSJgQQC39UWUBBH0IWOgJGAxZ/FQoBLAoCHHE=         | kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_      |
+| &lt;a href='index.php?code'>Here&lt;/a> you can find your secure code. | VwNFNxNRAF94EQEWOhNLCTdCD1FdDwdCYSlRFAdjVw5MfxIKDH9RUVwSDQsLO0FNCRctWBwXPB4XHH9RX1ZXRQ== | kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_2022k |
+| Well, that's all for now. Stay tuned for the next challenges.          | PAcJM00UEgo+DEgBfwoJFX9UX0ASBQ0ScUFnEgMmWBsHMQ4BWTldQhJGAwdFMQRMEkI8EA4eMw4LHjpBHg==     | kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_2022kbe_a4fb_xor_key_20    |
+
+From the 3rd column (`base64_decode(base64_message_xor_key) XOR message`), I figured out that my XOR key
+is `kbe_a4fb_xor_key_2022`.
+
+**Note 5:** For the Base64 decoding and XORing the data,
+I used the online tool [CyberChef](https://gchq.github.io/CyberChef/).
+[Here is the link](https://gchq.github.io/CyberChef/#recipe=From_Base64('A-Za-z0-9%2B/%3D',true,false)XOR(%7B'option':'UTF8','string':'Welcome%20%3Cb%3Eendlemar%3C/b%3E,%20this%20is%20your%20first%20secret%20message.'%7D,'Standard',false)&input=UEFjSlBBNVpBMEpqR2xFWE1ROEpIREpUUWc0ZENWeEpmeFZjRHhGL0VSeFNKZ1FRQzM5VVdVQkJIMElXT2dKR0F4Wi9GUW9CTEFvQ0hIRT0)
+for the exact recipe with the data (1st message).
+
+**Note 6:** Since I have got the index.php's source code, I could also directly find out my XOR key by
+evaluating `xor_key('endlemar')`. Just for fun, I tried that in the PHP interactive shell (see below),
+and I got the same result.
+
+```
+$ php -a
+Interactive shell
+
+php > function xor_key($username, $pattern = "kbe_REPLACE_xor_key_2022", $len = 4) {
+php {     return str_replace("REPLACE", substr(sha1($username . $pattern), 0, $len), $pattern);
+php { }
+php > echo xor_key('endlemar');
+kbe_a4fb_xor_key_2022
+php > 
+```
