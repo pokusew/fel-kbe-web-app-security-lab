@@ -13,8 +13,9 @@ Luckily, the app returned a page with an error message:
 Wrong SQL query: SELECT username FROM users WHERE username = 'endlemar' AND password = SHA1(CONCAT(''XXX', (SELECT salt FROM users WHERE username = 'endlemar')))
 ```
 
-Seeing the whole query and the position of my “password” `'XXX`, I constructed the following value for `password` that
-will result one row where username is `endlemar`:
+Seeing the whole query and the position of my “password” `'XXX`, I constructed the following value for `password`
+that allowed me to login without the correct password
+(because the SQL query resulted in one row where username is `endlemar`):
 
 ```
 ')) OR 1 = 1 AND username = 'endlemar' -- 
