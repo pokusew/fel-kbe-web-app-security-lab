@@ -288,3 +288,50 @@ php > echo xor_key('endlemar');
 kbe_a4fb_xor_key_2022
 php > 
 ```
+
+
+## Task 10
+
+One of the messages (the 2nd) provides a link to `https://kbe.felk.cvut.cz/index.php?code` titled “Here you can find
+your secure code.”. However, the server's response to the standard GET request (while a user is logged in) is **empty**.
+
+I looked into the source code of index.php and located the corresponding part that handles these requests:
+
+```php
+if (isset($_GET["code"], $_SESSION["username"], $_SESSION["logged"])) {
+    $code = q("SELECT AES_DECRYPT(UNHEX(aes_encrypt_code), '" . e(AES_ENCRYPT_CODE_KEY) . "') AS code FROM codes WHERE username = '" . e($_SESSION["username"]) . "'")->fetch_assoc()["code"];
+    echo($code);
+    exit();
+}
+```
+
+From the code above, it seems that the server is supposed to print the currently-logged-in user's secure code.
+However, the secure codes (`aes_encrypt_code`) in the `codes` table are apparently AES-encrypted.
+The code constructs a SQL SELECT query that uses MySQL function
+[`AES_DECRYPT(crypt_str, key_str)`](https://dev.mysql.com/doc/refman/8.0/en/encryption-functions.html#function_aes-decrypt)
+to perform AES decryption on the database side. The code populates the AES key (`key_str` argument) with the value of
+the `AES_ENCRYPT_CODE_KEY` constant, which is defined on line 19 (and on line 18, there is a commented out value):
+
+```php
+//define("AES_ENCRYPT_CODE_KEY", "iHw35UKAPaSYKf8SI44CwYPa");
+define("AES_ENCRYPT_CODE_KEY", "ebMHfcrRJn3EE1r8SHZ3Gv6N");
+```
+
+Nevertheless, it seems that the AES encryption with the given key fails and nothing (i.e., `NULL`) is returned back to
+the PHP code. That is probably the reason why `echo($code);` does not print anything and therefore the response to the
+GET request `https://kbe.felk.cvut.cz/index.php?code` has zero content length.
+
+I don't know if this is an expected behavior or if there is some problem with this task.
+
+
+## Task 11
+
+There is a row with the following values in the `codes` table.
+
+```
+username	aes_encrypt_code
+rehakmar	685CC663AF312DB6085966BC5DFACBECC941FFD90BA8EE46A96F020AF47CBF21
+```
+
+I assume that's the encrypted Martin Rehak's secure code.
+However, I don't know how to decrypt it.
