@@ -137,6 +137,115 @@ The tables contain the following data:
 * codes – 9 rows – [codes.tsv](./codes.tsv)
 
 
+## Task 5
+
+Based on the task's description, I implemented the [sha1_bruteforce.py](./sha1_bruteforce.py) script in Python 3.
+
+Below, you can find the script's source code:
+
+```python
+import argparse
+import hashlib
+import sys
+from string import ascii_lowercase, digits
+from itertools import product
+from typing import Optional, Collection
+
+
+DEFAULT_ALPHABET = digits + ascii_lowercase
+
+
+def crack_sha1(hex_digest: str, length: int, salt: str, alphabet: Collection[str]) -> Optional[str]:
+	assert len(hex_digest) == hashlib.sha1().digest_size * 2
+	n = len(alphabet) ** length
+	i = 0
+	matching_password = None
+	print(f'length={length} alphabet ({len(alphabet)}) = {alphabet}', file=sys.stderr)
+	print(f'num possible password n = {len(alphabet)}^{length} = {n}', file=sys.stderr)
+	for comb in product(alphabet, repeat=length):
+		i += 1
+		password = ''.join(comb)
+		# print(password)
+		data = password + salt
+		raw_data = data.encode('utf-8')
+		m = hashlib.sha1()
+		m.update(raw_data)
+		if m.hexdigest() == hex_digest:
+			matching_password = password
+			break
+	print(f'tried i={i} passwords out of n={n} possible', file=sys.stderr)
+	return matching_password
+
+
+if __name__ == '__main__':
+	parser = argparse.ArgumentParser(
+		description='Crack an SHA-1 password hash using brute force.',
+	)
+	parser.add_argument(
+		'--hash',
+		help='The SHA-1 password hash (40 lowercase hex characters)',
+		required=True,
+	)
+	parser.add_argument(
+		'--length',
+		help='The length of the password',
+		required=True,
+		type=int,
+	)
+	parser.add_argument(
+		'--salt',
+		help='Optional known password suffix salt, i.e., hash = sha1(password + salt)',
+		default='',
+	)
+	parser.add_argument(
+		'--alphabet',
+		help='The password alphabet',
+		default=DEFAULT_ALPHABET,
+	)
+	args = parser.parse_args()
+	cracked_password = crack_sha1(
+		hex_digest=args.hash,
+		length=args.length,
+		salt=args.salt,
+		alphabet=args.alphabet,
+	)
+	if cracked_password is None:
+		print('No SHA-1 digest match found!', file=sys.stderr)
+		sys.exit(1)
+	else:
+		print(cracked_password)
+```
+
+In order to crack my password, I used the script like this:
+
+```
+$ python3 sha1_bruteforce.py --hash 61f85462c63e4b80cce4cd707e85a1bf55f23ca0 --length 5 --salt ecde9
+length=5 alphabet (36) = 0123456789abcdefghijklmnopqrstuvwxyz
+num possible password n = 36^5 = 60466176
+tried i=15316431 passwords out of n=60466176 possible
+94a8e
+```
+
+My cracked password without the salt is `94a8e`.
+I tried logging in with my credentials (`endlemar` / `94a8e`) and it worked.
+
+
+## Task 6
+
+I used the online tool available at https://www.dcode.fr/sha1-hash to crack the salted password SHA-1
+hash `2d55131b6752f066ee2cc57ba8bf781b4376be85` (with the known salt `kckct`) of the user with username `jaroslav`.
+
+The cracked password without the salt is `fm9fytmf7q` (`fm9fytmf7qkckct` with the salt).
+
+
+## Task 7
+
+The teacher's password `fm9fytmf7q`, a seemingly random string, is insecure because it appears in some online SHA-1
+reverse dictionaries. The reason is that the string `fm9fytmf7q`
+is [apparently](https://gist.github.com/denizssch/72ec2aa1c5d0a84ffb57076f7dbf30d6)
+part of a leaked Microsoft Windows XP serial number `FM9FY - TMF7Q - ...`.
+
+
 ## Task 8
 
 See my solution of [Task 4](#task-4).
